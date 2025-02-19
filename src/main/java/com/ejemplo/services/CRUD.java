@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Interfaz genérica para operaciones CRUD.
- * @param <T> Tipo de entidad (Cliente, Producto, Pedido, etc.).
+ * @param <T> Tipo de entidad (Cliente, Producto, Pedido,).
  */
 public interface CRUD<T> {
     void agregar(T entidad);

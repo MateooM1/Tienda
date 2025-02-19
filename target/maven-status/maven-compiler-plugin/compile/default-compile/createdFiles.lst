@@ -1,0 +1,12 @@
+com\ejemplo\SecondaryController.class
+com\ejemplo\services\CRUD.class
+com\ejemplo\view\ClienteViewFX.class
+com\ejemplo\model\Pedido.class
+com\ejemplo\services\ClienteDAO.class
+com\ejemplo\App.class
+module-info.class
+com\ejemplo\controller\ClienteController.class
+com\ejemplo\model\Cliente.class
+com\ejemplo\PrimaryController.class
+com\ejemplo\services\ConnectionDB.class
+com\ejemplo\model\Producto.class

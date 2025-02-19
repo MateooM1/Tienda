@@ -1,0 +1,6 @@
+# Ignorar archivos compilados de Maven
+target/
+*.jar
+
+# Configuración de VS Code
+.vscode/

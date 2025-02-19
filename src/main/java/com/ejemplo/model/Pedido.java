@@ -5,7 +5,7 @@ import java.util.List;
 public class Pedido {
     private int id;
     private Cliente cliente;  
-    private List<Producto> productos; // Relación con la clase Producto
+    private List<Producto> productos; 
 
     public Pedido(int id, Cliente cliente, List<Producto> productos) {
         this.id = id;

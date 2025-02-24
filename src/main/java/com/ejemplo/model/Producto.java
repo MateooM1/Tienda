@@ -5,10 +5,18 @@ public class Producto {
     private String nombre;
     private double precio;
 
+    // Constructor completo
     public Producto(int id, String nombre, double precio) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
+    }
+
+    // Constructor con solo ID
+    public Producto(int id) {
+        this.id = id;
+        this.nombre = "Desconocido"; // Valor por defecto
+        this.precio = 0.0; // Valor por defecto
     }
 
     public int getId() {

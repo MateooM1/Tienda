@@ -2,8 +2,8 @@ package com.ejemplo.view;
 
 import java.util.List;
 
-import com.ejemplo.controller.ClienteController;
-import com.ejemplo.model.Cliente;
+import com.ejemplo.controller.ProductoController;
+import com.ejemplo.model.Producto;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -19,9 +19,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ClienteViewFX extends Application {
+public class ProductoViewFX extends Application {
 
-    private ClienteController clienteController;
+    private ProductoController productoController;
 
     public static void main(String[] args) {
         launch(args);
@@ -29,15 +29,15 @@ public class ClienteViewFX extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        clienteController = new ClienteController();
+        productoController = new ProductoController();
 
-        Label title = new Label("Gestión de Clientes");
+        Label title = new Label("Gestión de Productos");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        Button btnAgregar = crearBoton("Agregar Cliente", e -> mostrarAgregarCliente());
-        Button btnLeer = crearBoton("Ver Clientes", e -> mostrarClientes());
-        Button btnActualizar = crearBoton("Actualizar Cliente", e -> mostrarActualizarCliente());
-        Button btnEliminar = crearBoton("Eliminar Cliente", e -> mostrarEliminarCliente());
+        Button btnAgregar = crearBoton("Agregar Producto", e -> mostrarAgregarProducto());
+        Button btnLeer = crearBoton("Ver Productos", e -> mostrarProductos());
+        Button btnActualizar = crearBoton("Actualizar Producto", e -> mostrarActualizarProducto());
+        Button btnEliminar = crearBoton("Eliminar Producto", e -> mostrarEliminarProducto());
 
         VBox root = new VBox(15, title, btnAgregar, btnLeer, btnActualizar, btnEliminar);
         root.setPadding(new Insets(20));
@@ -45,7 +45,7 @@ public class ClienteViewFX extends Application {
         root.setStyle("-fx-background-color: #f4f4f4;");
 
         Scene scene = new Scene(root, 400, 300);
-        primaryStage.setTitle("Gestión de Clientes");
+        primaryStage.setTitle("Gestión de Productos");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -57,24 +57,24 @@ public class ClienteViewFX extends Application {
         return btn;
     }
 
-    private void mostrarAgregarCliente() {
-        mostrarFormularioCliente("Agregar Cliente", "Ingrese el nombre y email del cliente", null, null);
+    private void mostrarAgregarProducto() {
+        mostrarFormularioProducto("Agregar Producto", "Ingrese el nombre y precio del producto", null, 0.0);
     }
 
-    private void mostrarActualizarCliente() {
+    private void mostrarActualizarProducto() {
         TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Actualizar Cliente");
-        idDialog.setHeaderText("Ingrese el ID del cliente a actualizar.");
-        idDialog.setContentText("ID del cliente:");
+        idDialog.setTitle("Actualizar Producto");
+        idDialog.setHeaderText("Ingrese el ID del producto a actualizar.");
+        idDialog.setContentText("ID del producto:");
 
         idDialog.showAndWait().ifPresent(idStr -> {
             try {
                 int id = Integer.parseInt(idStr);
-                Cliente cliente = clienteController.obtenerClientePorId(id);
-                if (cliente != null) {
-                    mostrarFormularioCliente("Actualizar Cliente", "Modifique los datos del cliente", cliente.getNombre(), cliente.getEmail(), id);
+                Producto producto = productoController.obtenerProductoPorId(id);
+                if (producto != null) {
+                    mostrarFormularioProducto("Actualizar Producto", "Modifique los datos del producto", producto.getNombre(), producto.getPrecio(), id);
                 } else {
-                    mostrarMensaje("Cliente no encontrado.");
+                    mostrarMensaje("Producto no encontrado.");
                 }
             } catch (NumberFormatException e) {
                 mostrarMensaje("ID no válido.");
@@ -82,11 +82,11 @@ public class ClienteViewFX extends Application {
         });
     }
 
-    private void mostrarFormularioCliente(String titulo, String mensaje, String nombreInicial, String emailInicial) {
-        mostrarFormularioCliente(titulo, mensaje, nombreInicial, emailInicial, -1);
+    private void mostrarFormularioProducto(String titulo, String mensaje, String nombreInicial, double precioInicial) {
+        mostrarFormularioProducto(titulo, mensaje, nombreInicial, precioInicial, -1);
     }
 
-    private void mostrarFormularioCliente(String titulo, String mensaje, String nombreInicial, String emailInicial, int id) {
+    private void mostrarFormularioProducto(String titulo, String mensaje, String nombreInicial, double precioInicial, int id) {
         Stage stage = new Stage();
         stage.setTitle(titulo);
 
@@ -98,26 +98,26 @@ public class ClienteViewFX extends Application {
 
         Label lblNombre = new Label("Nombre:");
         TextField txtNombre = new TextField(nombreInicial != null ? nombreInicial : "");
-        Label lblEmail = new Label("Email:");
-        TextField txtEmail = new TextField(emailInicial != null ? emailInicial : "");
+        Label lblPrecio = new Label("Precio:");
+        TextField txtPrecio = new TextField(precioInicial > 0 ? String.valueOf(precioInicial) : "");
 
         Button btnGuardar = new Button("Guardar");
         btnGuardar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10px;");
         btnGuardar.setOnAction(e -> {
             if (id == -1) {
-                clienteController.agregarCliente(txtNombre.getText(), txtEmail.getText());
-                mostrarMensaje("Cliente agregado correctamente");
+                productoController.agregarProducto(txtNombre.getText(), Double.parseDouble(txtPrecio.getText()));
+                mostrarMensaje("Producto agregado correctamente");
             } else {
-                clienteController.actualizarCliente(id, txtNombre.getText(), txtEmail.getText());
-                mostrarMensaje("Cliente actualizado correctamente");
+                productoController.actualizarProducto(id, txtNombre.getText(), Double.parseDouble(txtPrecio.getText()));
+                mostrarMensaje("Producto actualizado correctamente");
             }
             stage.close();
         });
 
         grid.add(lblNombre, 0, 0);
         grid.add(txtNombre, 1, 0);
-        grid.add(lblEmail, 0, 1);
-        grid.add(txtEmail, 1, 1);
+        grid.add(lblPrecio, 0, 1);
+        grid.add(txtPrecio, 1, 1);
         grid.add(btnGuardar, 1, 2);
 
         Scene scene = new Scene(grid, 350, 200);
@@ -125,37 +125,37 @@ public class ClienteViewFX extends Application {
         stage.show();
     }
 
-    private void mostrarClientes() {
-        List<Cliente> clientes = clienteController.obtenerClientes();
+    private void mostrarProductos() {
+        List<Producto> productos = productoController.obtenerProductos();
         StringBuilder sb = new StringBuilder();
-        for (Cliente cliente : clientes) {
-            sb.append(cliente).append("\n");
+        for (Producto producto : productos) {
+            sb.append(producto).append("\n");
         }
 
         TextArea textArea = new TextArea(sb.toString());
         textArea.setEditable(false);
 
         Stage stage = new Stage();
-        VBox vbox = new VBox(new Label("Clientes:"), textArea);
+        VBox vbox = new VBox(new Label("Productos:"), textArea);
         vbox.setPadding(new Insets(20));
 
         Scene scene = new Scene(vbox, 400, 300);
-        stage.setTitle("Lista de Clientes");
+        stage.setTitle("Lista de Productos");
         stage.setScene(scene);
         stage.show();
     }
 
-    private void mostrarEliminarCliente() {
+    private void mostrarEliminarProducto() {
         TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Eliminar Cliente");
-        idDialog.setHeaderText("Ingrese el ID del cliente a eliminar.");
-        idDialog.setContentText("ID del cliente:");
+        idDialog.setTitle("Eliminar Producto");
+        idDialog.setHeaderText("Ingrese el ID del producto a eliminar.");
+        idDialog.setContentText("ID del producto:");
 
         idDialog.showAndWait().ifPresent(idStr -> {
             try {
                 int id = Integer.parseInt(idStr);
-                clienteController.eliminarCliente(id);
-                mostrarMensaje("Cliente eliminado correctamente");
+                productoController.eliminarProducto(id);
+                mostrarMensaje("Producto eliminado correctamente");
             } catch (NumberFormatException e) {
                 mostrarMensaje("ID no válido.");
             }

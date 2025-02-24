@@ -9,8 +9,8 @@ public class ConnectionDB {
     private static ConnectionDB instancia;
     private Connection conexion;
     private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=Tienda;encrypt=true;trustServerCertificate=true";
-    private static final String USUARIO = "mantiz";
-    private static final String PASSWORD = "123456";
+    private static final String USUARIO = "sa";
+    private static final String PASSWORD = "$0nLine4Biz";
 
     private ConnectionDB() {
         try {

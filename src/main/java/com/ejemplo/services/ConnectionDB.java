@@ -4,13 +4,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import com.ejemplo.ConfigLoader;
+
+
 public class ConnectionDB {
 
     private static ConnectionDB instancia;
     private Connection conexion;
-    private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=Tienda;encrypt=true;trustServerCertificate=true";
-    private static final String USUARIO = "sa";
-    private static final String PASSWORD = "$0nLine4Biz";
+    String URL = ConfigLoader.get("DB_URL");
+    String USUARIO = ConfigLoader.get("DB_USER");
+    String PASSWORD = ConfigLoader.get("DB_PASSWORD");
+
 
     private ConnectionDB() {
         try {

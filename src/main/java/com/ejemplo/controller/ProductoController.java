@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.ejemplo.model.Producto;
 import com.ejemplo.services.ProductoDAO;
+import com.ejemplo.view.ErrorHandler;
+
 
 public class ProductoController {
 
@@ -14,24 +16,46 @@ public class ProductoController {
     }
 
     public void agregarProducto(String nombre, double precio) {
-        Producto producto = new Producto(0, nombre, precio);
-        productoDAO.agregar(producto);
+        try {
+            Producto producto = new Producto(0, nombre, precio);
+            productoDAO.agregar(producto);
+        } catch (Exception e) {
+            ErrorHandler.showError(e.getMessage());
+        }
     }
 
     public List<Producto> obtenerProductos() {
-        return productoDAO.obtenerTodos();
+        try {
+            return productoDAO.obtenerTodos();
+        } catch (Exception e) {
+            ErrorHandler.showError(e.getMessage());
+            return null;
+        }
     }
 
     public Producto obtenerProductoPorId(int id) {
-        return productoDAO.obtenerPorId(id);
+        try {
+            return productoDAO.obtenerPorId(id);
+        } catch (Exception e) {
+            ErrorHandler.showError(e.getMessage());
+            return null;
+        }
     }
 
     public void actualizarProducto(int id, String nombre, double precio) {
-        Producto producto = new Producto(id, nombre, precio);
-        productoDAO.actualizar(producto);
+        try {
+            Producto producto = new Producto(id, nombre, precio);
+            productoDAO.actualizar(producto);
+        } catch (Exception e) {
+            ErrorHandler.showError(e.getMessage());
+        }
     }
 
     public void eliminarProducto(int id) {
-        productoDAO.eliminar(id);
+        try {
+            productoDAO.eliminar(id);
+        } catch (Exception e) {
+            ErrorHandler.showError(e.getMessage());
+        }
     }
 }

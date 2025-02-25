@@ -34,7 +34,7 @@ public class ClienteViewFX extends Application {
         Label title = new Label("Gestión de Clientes");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        Button btnAgregar = crearBoton("Agregar Cliente", e -> mostrarAgregarCliente());
+        Button btnAgregar = crearBoton("Agregar Cliente", e -> mostrarFormularioCliente("Agregar Cliente", "Ingrese los datos del cliente", null, null, -1));
         Button btnLeer = crearBoton("Ver Clientes", e -> mostrarClientes());
         Button btnActualizar = crearBoton("Actualizar Cliente", e -> mostrarActualizarCliente());
         Button btnEliminar = crearBoton("Eliminar Cliente", e -> mostrarEliminarCliente());
@@ -57,33 +57,38 @@ public class ClienteViewFX extends Application {
         return btn;
     }
 
-    private void mostrarAgregarCliente() {
-        mostrarFormularioCliente("Agregar Cliente", "Ingrese el nombre y email del cliente", null, null);
+    private void mostrarActualizarCliente() {
+        int id = solicitarIdCliente("Actualizar Cliente");
+        if (id != -1) {
+            Cliente cliente = clienteController.obtenerClientePorId(id);
+            if (cliente != null) {
+                mostrarFormularioCliente("Actualizar Cliente", "Modifique los datos del cliente", cliente.getNombre(), cliente.getEmail(), id);
+            }
+        }
     }
 
-    private void mostrarActualizarCliente() {
+    private void mostrarEliminarCliente() {
+        int id = solicitarIdCliente("Eliminar Cliente");
+        if (id != -1) {
+            clienteController.eliminarCliente(id);
+            mostrarMensaje("Cliente eliminado correctamente");
+        }
+    }
+
+    private int solicitarIdCliente(String titulo) {
         TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Actualizar Cliente");
-        idDialog.setHeaderText("Ingrese el ID del cliente a actualizar.");
+        idDialog.setTitle(titulo);
+        idDialog.setHeaderText("Ingrese el ID del cliente.");
         idDialog.setContentText("ID del cliente:");
 
-        idDialog.showAndWait().ifPresent(idStr -> {
+        return idDialog.showAndWait().map(idStr -> {
             try {
-                int id = Integer.parseInt(idStr);
-                Cliente cliente = clienteController.obtenerClientePorId(id);
-                if (cliente != null) {
-                    mostrarFormularioCliente("Actualizar Cliente", "Modifique los datos del cliente", cliente.getNombre(), cliente.getEmail(), id);
-                } else {
-                    mostrarMensaje("Cliente no encontrado.");
-                }
+                return Integer.parseInt(idStr);
             } catch (NumberFormatException e) {
                 mostrarMensaje("ID no válido.");
+                return -1;
             }
-        });
-    }
-
-    private void mostrarFormularioCliente(String titulo, String mensaje, String nombreInicial, String emailInicial) {
-        mostrarFormularioCliente(titulo, mensaje, nombreInicial, emailInicial, -1);
+        }).orElse(-1);
     }
 
     private void mostrarFormularioCliente(String titulo, String mensaje, String nombreInicial, String emailInicial, int id) {
@@ -128,9 +133,7 @@ public class ClienteViewFX extends Application {
     private void mostrarClientes() {
         List<Cliente> clientes = clienteController.obtenerClientes();
         StringBuilder sb = new StringBuilder();
-        for (Cliente cliente : clientes) {
-            sb.append(cliente).append("\n");
-        }
+        clientes.forEach(cliente -> sb.append(cliente).append("\n"));
 
         TextArea textArea = new TextArea(sb.toString());
         textArea.setEditable(false);
@@ -143,23 +146,6 @@ public class ClienteViewFX extends Application {
         stage.setTitle("Lista de Clientes");
         stage.setScene(scene);
         stage.show();
-    }
-
-    private void mostrarEliminarCliente() {
-        TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Eliminar Cliente");
-        idDialog.setHeaderText("Ingrese el ID del cliente a eliminar.");
-        idDialog.setContentText("ID del cliente:");
-
-        idDialog.showAndWait().ifPresent(idStr -> {
-            try {
-                int id = Integer.parseInt(idStr);
-                clienteController.eliminarCliente(id);
-                mostrarMensaje("Cliente eliminado correctamente");
-            } catch (NumberFormatException e) {
-                mostrarMensaje("ID no válido.");
-            }
-        });
     }
 
     private void mostrarMensaje(String mensaje) {

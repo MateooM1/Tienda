@@ -1,9 +1,12 @@
 package com.ejemplo.view;
 
+import com.ejemplo.services.ConnectionDB;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -23,7 +26,21 @@ public class MainViewFX extends Application {
         Button btnPedidos = new Button("Gestión de Pedidos");
         btnPedidos.setOnAction(e -> new PedidoViewFX().start(new Stage()));
 
-        VBox root = new VBox(15, btnClientes, btnProductos, btnPedidos);
+        Button btnTestConexion = new Button(" Probar Conexión BD");
+        btnTestConexion.setOnAction(e -> {
+            try {
+                ConnectionDB db = ConnectionDB.getInstancia();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Conexión Exitosa");
+                alert.setHeaderText("Base de Datos");
+                alert.setContentText(" Conectado correctamente a SQL Server.");
+                alert.showAndWait();
+            } catch (Exception ex) {
+                ErrorHandler.showError(ex.getMessage());
+            }
+        });
+
+        VBox root = new VBox(15, btnClientes, btnProductos, btnPedidos, btnTestConexion);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
 

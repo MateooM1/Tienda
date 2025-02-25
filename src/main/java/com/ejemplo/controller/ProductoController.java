@@ -58,4 +58,13 @@ public class ProductoController {
             ErrorHandler.showError(e.getMessage());
         }
     }
+    
+    public List<Producto> obtenerProductosPorRangoDePrecio(double minPrecio, double maxPrecio) {
+        try {
+            return productoDAO.obtenerProductosPorRangoDePrecio(minPrecio, maxPrecio);
+        } catch (Exception e) {
+            ErrorHandler.showError(e.getMessage());
+            return null;
+        }
+    }
 }

@@ -94,4 +94,27 @@ public class ProductoDAO implements CRUD<Producto> {
             throw new Exception("Error al eliminar producto: " + e.getMessage(), e);
         }
     }
+    public List<Producto> obtenerProductosPorRangoDePrecio(double minPrecio, double maxPrecio) throws Exception {
+        List<Producto> productos = new ArrayList<>();
+        String query = "SELECT * FROM productos WHERE precio BETWEEN ? AND ?";
+        
+        try (Connection connection = ConnectionDB.getInstancia().getConexion();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+             
+            stmt.setDouble(1, minPrecio);
+            stmt.setDouble(2, maxPrecio);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                productos.add(new Producto(
+                    rs.getInt("id"),
+                    rs.getString("nombre"),
+                    rs.getDouble("precio")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error al obtener productos por rango de precio: " + e.getMessage(), e);
+        }
+        return productos;
+    }
 }

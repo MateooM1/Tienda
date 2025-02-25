@@ -38,8 +38,9 @@ public class ProductoViewFX extends Application {
         Button btnLeer = crearBoton("Ver Productos", e -> mostrarProductos());
         Button btnActualizar = crearBoton("Actualizar Producto", e -> mostrarActualizarProducto());
         Button btnEliminar = crearBoton("Eliminar Producto", e -> mostrarEliminarProducto());
+        Button btnBuscarPorPrecio = crearBoton("Buscar por Precio", e -> mostrarBusquedaPorPrecio());
 
-        VBox root = new VBox(15, title, btnAgregar, btnLeer, btnActualizar, btnEliminar);
+        VBox root = new VBox(15, title, btnAgregar, btnLeer, btnActualizar, btnEliminar,btnBuscarPorPrecio);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #f4f4f4;");
@@ -160,6 +161,68 @@ public class ProductoViewFX extends Application {
             }
         });
     }
+    private void mostrarBusquedaPorPrecio() {
+        Stage stage = new Stage();
+        stage.setTitle("Buscar Productos por Precio");
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setAlignment(Pos.CENTER);
+
+        Label lblMinPrecio = new Label("Precio Mínimo:");
+        TextField txtMinPrecio = new TextField();
+        Label lblMaxPrecio = new Label("Precio Máximo:");
+        TextField txtMaxPrecio = new TextField();
+
+        Button btnBuscar = new Button("Buscar");
+        btnBuscar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10px;");
+        btnBuscar.setOnAction(e -> {
+            try {
+                double minPrecio = Double.parseDouble(txtMinPrecio.getText().trim());
+                double maxPrecio = Double.parseDouble(txtMaxPrecio.getText().trim());
+
+                List<Producto> productos = productoController.obtenerProductosPorRangoDePrecio(minPrecio, maxPrecio);
+                mostrarResultadosBusqueda(productos);
+
+                stage.close();
+            } catch (NumberFormatException ex) {
+                mostrarMensaje("Ingrese valores numéricos válidos.");
+            }
+        });
+
+        grid.add(lblMinPrecio, 0, 0);
+        grid.add(txtMinPrecio, 1, 0);
+        grid.add(lblMaxPrecio, 0, 1);
+        grid.add(txtMaxPrecio, 1, 1);
+        grid.add(btnBuscar, 1, 2);
+
+        stage.setScene(new Scene(grid, 350, 200));
+        stage.show();
+    }
+
+    private void mostrarResultadosBusqueda(List<Producto> productos) {
+        Stage stage = new Stage();
+        stage.setTitle("Resultados de Búsqueda");
+
+        StringBuilder sb = new StringBuilder();
+        if (productos.isEmpty()) {
+            sb.append("No se encontraron productos en el rango de precios especificado.");
+        } else {
+            productos.forEach(p -> sb.append(p).append("\n"));
+        }
+
+        TextArea textArea = new TextArea(sb.toString());
+        textArea.setEditable(false);
+
+        VBox vbox = new VBox(new Label("Productos Encontrados:"), textArea);
+        vbox.setPadding(new Insets(20));
+
+        stage.setScene(new Scene(vbox, 400, 300));
+        stage.show();
+    }
+
 
     private void mostrarMensaje(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

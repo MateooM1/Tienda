@@ -7,9 +7,9 @@ import java.util.List;
  * @param <T> Tipo de entidad (Cliente, Producto, Pedido,).
  */
 public interface CRUD<T> {
-    void agregar(T entidad);
-    T obtenerPorId(int id);
-    List<T> obtenerTodos();
-    void actualizar(T entidad);
-    void eliminar(int id);
+    void agregar(T entidad) throws Exception;
+    T obtenerPorId(int id) throws Exception;
+    List<T> obtenerTodos() throws Exception;
+    void actualizar(T entidad) throws Exception;
+    void eliminar(int id) throws Exception;
 }

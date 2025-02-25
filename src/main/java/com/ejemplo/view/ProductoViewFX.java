@@ -44,9 +44,8 @@ public class ProductoViewFX extends Application {
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #f4f4f4;");
 
-        Scene scene = new Scene(root, 400, 300);
+        primaryStage.setScene(new Scene(root, 400, 300));
         primaryStage.setTitle("Gestión de Productos");
-        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
@@ -57,36 +56,7 @@ public class ProductoViewFX extends Application {
         return btn;
     }
 
-    private void mostrarAgregarProducto() {
-        mostrarFormularioProducto("Agregar Producto", "Ingrese el nombre y precio del producto", null, 0.0);
-    }
-
-    private void mostrarActualizarProducto() {
-        TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Actualizar Producto");
-        idDialog.setHeaderText("Ingrese el ID del producto a actualizar.");
-        idDialog.setContentText("ID del producto:");
-
-        idDialog.showAndWait().ifPresent(idStr -> {
-            try {
-                int id = Integer.parseInt(idStr);
-                Producto producto = productoController.obtenerProductoPorId(id);
-                if (producto != null) {
-                    mostrarFormularioProducto("Actualizar Producto", "Modifique los datos del producto", producto.getNombre(), producto.getPrecio(), id);
-                } else {
-                    mostrarMensaje("Producto no encontrado.");
-                }
-            } catch (NumberFormatException e) {
-                mostrarMensaje("ID no válido.");
-            }
-        });
-    }
-
-    private void mostrarFormularioProducto(String titulo, String mensaje, String nombreInicial, double precioInicial) {
-        mostrarFormularioProducto(titulo, mensaje, nombreInicial, precioInicial, -1);
-    }
-
-    private void mostrarFormularioProducto(String titulo, String mensaje, String nombreInicial, double precioInicial, int id) {
+    private void mostrarFormularioProducto(String titulo, String mensaje, String nombreInicial, double precioInicial, Integer id) {
         Stage stage = new Stage();
         stage.setTitle(titulo);
 
@@ -104,14 +74,26 @@ public class ProductoViewFX extends Application {
         Button btnGuardar = new Button("Guardar");
         btnGuardar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10px;");
         btnGuardar.setOnAction(e -> {
-            if (id == -1) {
-                productoController.agregarProducto(txtNombre.getText(), Double.parseDouble(txtPrecio.getText()));
-                mostrarMensaje("Producto agregado correctamente");
-            } else {
-                productoController.actualizarProducto(id, txtNombre.getText(), Double.parseDouble(txtPrecio.getText()));
-                mostrarMensaje("Producto actualizado correctamente");
+            try {
+                String nombre = txtNombre.getText().trim();
+                double precio = Double.parseDouble(txtPrecio.getText().trim());
+                
+                if (nombre.isEmpty() || precio <= 0) {
+                    mostrarMensaje("Datos inválidos. Verifique los campos.");
+                    return;
+                }
+                
+                if (id == null) {
+                    productoController.agregarProducto(nombre, precio);
+                    mostrarMensaje("Producto agregado correctamente");
+                } else {
+                    productoController.actualizarProducto(id, nombre, precio);
+                    mostrarMensaje("Producto actualizado correctamente");
+                }
+                stage.close();
+            } catch (NumberFormatException ex) {
+                mostrarMensaje("Ingrese un precio válido.");
             }
-            stage.close();
         });
 
         grid.add(lblNombre, 0, 0);
@@ -120,17 +102,36 @@ public class ProductoViewFX extends Application {
         grid.add(txtPrecio, 1, 1);
         grid.add(btnGuardar, 1, 2);
 
-        Scene scene = new Scene(grid, 350, 200);
-        stage.setScene(scene);
+        stage.setScene(new Scene(grid, 350, 200));
         stage.show();
+    }
+
+    private void mostrarAgregarProducto() {
+        mostrarFormularioProducto("Agregar Producto", "Ingrese los datos del producto", null, 0.0, null);
+    }
+
+    private void mostrarActualizarProducto() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Actualizar Producto");
+        dialog.setHeaderText("Ingrese el ID del producto a actualizar.");
+
+        dialog.showAndWait().ifPresent(idStr -> {
+            try {
+                int id = Integer.parseInt(idStr);
+                Producto producto = productoController.obtenerProductoPorId(id);
+                if (producto != null) {
+                    mostrarFormularioProducto("Actualizar Producto", "Modifique los datos del producto", producto.getNombre(), producto.getPrecio(), id);
+                } 
+            } catch (NumberFormatException e) {
+                mostrarMensaje("ID no válido.");
+            }
+        });
     }
 
     private void mostrarProductos() {
         List<Producto> productos = productoController.obtenerProductos();
         StringBuilder sb = new StringBuilder();
-        for (Producto producto : productos) {
-            sb.append(producto).append("\n");
-        }
+        productos.forEach(producto -> sb.append(producto).append("\n"));
 
         TextArea textArea = new TextArea(sb.toString());
         textArea.setEditable(false);
@@ -139,19 +140,17 @@ public class ProductoViewFX extends Application {
         VBox vbox = new VBox(new Label("Productos:"), textArea);
         vbox.setPadding(new Insets(20));
 
-        Scene scene = new Scene(vbox, 400, 300);
+        stage.setScene(new Scene(vbox, 400, 300));
         stage.setTitle("Lista de Productos");
-        stage.setScene(scene);
         stage.show();
     }
 
     private void mostrarEliminarProducto() {
-        TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Eliminar Producto");
-        idDialog.setHeaderText("Ingrese el ID del producto a eliminar.");
-        idDialog.setContentText("ID del producto:");
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Eliminar Producto");
+        dialog.setHeaderText("Ingrese el ID del producto a eliminar.");
 
-        idDialog.showAndWait().ifPresent(idStr -> {
+        dialog.showAndWait().ifPresent(idStr -> {
             try {
                 int id = Integer.parseInt(idStr);
                 productoController.eliminarProducto(id);

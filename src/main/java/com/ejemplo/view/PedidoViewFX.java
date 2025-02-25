@@ -9,7 +9,6 @@ import com.ejemplo.model.Cliente;
 import com.ejemplo.model.Pedido;
 import com.ejemplo.model.Producto;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,22 +24,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class PedidoViewFX extends Application {
+public class PedidoViewFX {
 
-    private PedidoController pedidoController;
-    private ClienteController clienteController;
-    private ProductoController productoController;
+    private final PedidoController pedidoController = new PedidoController();
+    private final ClienteController clienteController = new ClienteController();
+    private final ProductoController productoController = new ProductoController();
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    @Override
     public void start(Stage primaryStage) {
-        pedidoController = new PedidoController();
-        clienteController = new ClienteController();
-        productoController = new ProductoController();
-
         Label title = new Label("Gestión de Pedidos");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
@@ -68,7 +58,7 @@ public class PedidoViewFX extends Application {
     }
 
     private void mostrarAgregarPedido() {
-        mostrarFormularioPedido("Agregar Pedido", null, null);
+        mostrarFormularioPedido("Agregar Pedido", null, null, -1);
     }
 
     private void mostrarActualizarPedido() {
@@ -78,92 +68,30 @@ public class PedidoViewFX extends Application {
         idDialog.setContentText("ID del pedido:");
 
         idDialog.showAndWait().ifPresent(idStr -> {
-            try {
-                int id = Integer.parseInt(idStr);
-                Pedido pedido = pedidoController.obtenerPedidoPorId(id);
-                if (pedido != null) {
-                    mostrarFormularioPedido("Actualizar Pedido", pedido.getCliente(), pedido.getProductos(), id);
-                } else {
-                    mostrarMensaje("Pedido no encontrado.");
-                }
-            } catch (NumberFormatException e) {
-                mostrarMensaje("ID no válido.");
-            }
-        });
-    }
-
-    private void mostrarFormularioPedido(String titulo, Cliente clienteSeleccionado, List<Producto> productosSeleccionados) {
-        mostrarFormularioPedido(titulo, clienteSeleccionado, productosSeleccionados, -1);
-    }
-
-    private void mostrarFormularioPedido(String titulo, Cliente clienteSeleccionado, List<Producto> productosSeleccionados, int id) {
-        Stage stage = new Stage();
-        stage.setTitle(titulo);
-
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(20));
-        grid.setVgap(10);
-        grid.setHgap(10);
-        grid.setAlignment(Pos.CENTER);
-
-        Label lblCliente = new Label("Cliente:");
-        ComboBox<Cliente> cmbClientes = new ComboBox<>();
-        cmbClientes.getItems().addAll(clienteController.obtenerClientes());
-        cmbClientes.setValue(clienteSeleccionado);
-
-        Label lblProductos = new Label("Productos:");
-        ListView<Producto> lstProductos = new ListView<>();
-        lstProductos.getItems().addAll(productoController.obtenerProductos());
-        lstProductos.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        if (productosSeleccionados != null) {
-            for (Producto producto : productosSeleccionados) {
-                int index = lstProductos.getItems().indexOf(producto);
-                if (index != -1) {
-                    lstProductos.getSelectionModel().select(index);
-                }
-            }
-        }
-        Button btnGuardar = new Button("Guardar");
-        btnGuardar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10px;");
-        btnGuardar.setOnAction(e -> {
-            Cliente cliente = cmbClientes.getValue();
-            List<Producto> productos = lstProductos.getSelectionModel().getSelectedItems();
-
-            if (cliente == null || productos.isEmpty()) {
-                mostrarMensaje("Debe seleccionar un cliente y al menos un producto.");
-                return;
-            }
-
-            if (id == -1) {
-                pedidoController.agregarPedido(cliente, productos);
-                mostrarMensaje("Pedido agregado correctamente");
+            Pedido pedido = pedidoController.obtenerPedidoPorId(Integer.parseInt(idStr));
+            if (pedido != null) {
+                mostrarFormularioPedido("Actualizar Pedido", pedido.getCliente(), pedido.getProductos(), pedido.getId());
             } else {
-                pedidoController.actualizarPedido(id, cliente, productos);
-                mostrarMensaje("Pedido actualizado correctamente");
+                mostrarMensaje("Pedido no encontrado.", Alert.AlertType.WARNING);
             }
-            stage.close();
         });
+    }
 
-        grid.add(lblCliente, 0, 0);
-        grid.add(cmbClientes, 1, 0);
-        grid.add(lblProductos, 0, 1);
-        grid.add(lstProductos, 1, 1);
-        grid.add(btnGuardar, 1, 2);
+    private void mostrarEliminarPedido() {
+        TextInputDialog idDialog = new TextInputDialog();
+        idDialog.setTitle("Eliminar Pedido");
+        idDialog.setHeaderText("Ingrese el ID del pedido a eliminar.");
+        idDialog.setContentText("ID del pedido:");
 
-        Scene scene = new Scene(grid, 400, 300);
-        stage.setScene(scene);
-        stage.show();
+        idDialog.showAndWait().ifPresent(idStr -> {
+            pedidoController.eliminarPedido(Integer.parseInt(idStr));
+            mostrarMensaje("Pedido eliminado correctamente", Alert.AlertType.INFORMATION);
+        });
     }
 
     private void mostrarPedidos() {
         List<Pedido> pedidos = pedidoController.obtenerPedidos();
-        StringBuilder sb = new StringBuilder();
-        for (Pedido pedido : pedidos) {
-            sb.append(pedido).append("\n");
-        }
-
-        TextArea textArea = new TextArea(sb.toString());
+        TextArea textArea = new TextArea(pedidos.toString());
         textArea.setEditable(false);
 
         Stage stage = new Stage();
@@ -176,26 +104,56 @@ public class PedidoViewFX extends Application {
         stage.show();
     }
 
-    private void mostrarEliminarPedido() {
-        TextInputDialog idDialog = new TextInputDialog();
-        idDialog.setTitle("Eliminar Pedido");
-        idDialog.setHeaderText("Ingrese el ID del pedido a eliminar.");
-        idDialog.setContentText("ID del pedido:");
+    private void mostrarFormularioPedido(String titulo, Cliente clienteSeleccionado, List<Producto> productosSeleccionados, int id) {
+        Stage stage = new Stage();
+        stage.setTitle(titulo);
 
-        idDialog.showAndWait().ifPresent(idStr -> {
-            try {
-                int id = Integer.parseInt(idStr);
-                pedidoController.eliminarPedido(id);
-                mostrarMensaje("Pedido eliminado correctamente");
-            } catch (NumberFormatException e) {
-                mostrarMensaje("ID no válido.");
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setAlignment(Pos.CENTER);
+
+        ComboBox<Cliente> cmbClientes = new ComboBox<>();
+        cmbClientes.getItems().addAll(clienteController.obtenerClientes());
+        cmbClientes.setValue(clienteSeleccionado);
+
+        ListView<Producto> lstProductos = new ListView<>();
+        lstProductos.getItems().addAll(productoController.obtenerProductos());
+        lstProductos.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        Button btnGuardar = new Button("Guardar");
+        btnGuardar.setOnAction(e -> {
+            Cliente cliente = cmbClientes.getValue();
+            List<Producto> productos = lstProductos.getSelectionModel().getSelectedItems();
+            if (cliente == null || productos.isEmpty()) {
+                mostrarMensaje("Debe seleccionar un cliente y al menos un producto.", Alert.AlertType.ERROR);
+                return;
             }
+            if (id == -1) {
+                pedidoController.agregarPedido(cliente, productos);
+                mostrarMensaje("Pedido agregado correctamente", Alert.AlertType.INFORMATION);
+            } else {
+                pedidoController.actualizarPedido(id, cliente, productos);
+                mostrarMensaje("Pedido actualizado correctamente", Alert.AlertType.INFORMATION);
+            }
+            stage.close();
         });
+
+        grid.add(new Label("Cliente:"), 0, 0);
+        grid.add(cmbClientes, 1, 0);
+        grid.add(new Label("Productos:"), 0, 1);
+        grid.add(lstProductos, 1, 1);
+        grid.add(btnGuardar, 1, 2);
+
+        Scene scene = new Scene(grid, 400, 300);
+        stage.setScene(scene);
+        stage.show();
     }
 
-    private void mostrarMensaje(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Operación realizada");
+    private void mostrarMensaje(String mensaje, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle("Información");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();

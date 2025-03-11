@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.ejemplo.model.Producto;
 
-public class ProductoDAO implements CRUD<Producto> {
+public class ProductoDAO implements ProductoService {
 
     @Override
     public void agregar(Producto producto) throws Exception {

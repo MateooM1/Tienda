@@ -2,7 +2,10 @@ package com.ejemplo.controller;
 
 import java.util.List;
 
+import com.ejemplo.model.FactoriaProducto;
 import com.ejemplo.model.Producto;
+import com.ejemplo.model.factoriaAlimento;
+import com.ejemplo.model.factoriaElectronico;
 import com.ejemplo.services.ProductoDAO;
 import com.ejemplo.view.ErrorHandler;
 
@@ -67,4 +70,10 @@ public class ProductoController {
             return null;
         }
     }
-}
+
+        FactoriaProducto factoriaAlimento = new factoriaAlimento();
+        Producto manzana = factoriaAlimento.crearProducto(1, "Manzana", 1.50, "2025-01-01", "0.3");
+
+        FactoriaProducto factoriaElectronico = new factoriaElectronico();
+        Producto laptop = factoriaElectronico.crearProducto(2, "Laptop Dell", 1200.00, "Dell", "24");
+    }

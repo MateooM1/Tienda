@@ -1,15 +1,18 @@
 package com.ejemplo.model;
 
+import java.util.Random;
+
 public class Producto {
     private int id;
     private String nombre;
     private double precio;
+    private String tipo;
 
     // Constructor completo
-    public Producto(int id, String nombre, double precio) {
-        this.id = id;
-        this.nombre = nombre;
+    public Producto(String tipo, int id, String nombre, double precio) {
+        this.id = (id == 0) ? generarNuevoId() : id;        this.nombre = nombre;
         this.precio = precio;
+        this.tipo = tipo;
     }
 
     // Constructor con solo ID
@@ -17,8 +20,13 @@ public class Producto {
         this.id = id;
         this.nombre = "Desconocido"; // Valor por defecto
         this.precio = 0.0; // Valor por defecto
+        this.tipo = "Desconocido";
     }
 
+    private static int generarNuevoId() {
+        return new Random().nextInt(10000); // Simulación de ID único
+    }
+    
     public int getId() {
         return id;
     }
@@ -31,6 +39,10 @@ public class Producto {
         return precio;
     }
 
+    public String getTipo() {
+        return tipo;
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -39,8 +51,12 @@ public class Producto {
         this.precio = precio;
     }
 
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
     @Override
     public String toString() {
-        return "Producto{id=" + id + ", nombre='" + nombre + "', precio=" + precio + "}";
-    }
+        return "Producto{tipo='" + tipo + "', id=" + id + ", nombre='" + nombre + "', precio=" + precio + "}";   
+     }
 }

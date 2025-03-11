@@ -3,7 +3,10 @@ package com.ejemplo.view;
 import java.util.List;
 
 import com.ejemplo.controller.ProductoController;
-import com.ejemplo.model.Producto;
+import com.ejemplo.model.FactoriaProducto;
+import com.ejemplo.model.Producto; // Agregado para usar el Factory Method
+import com.ejemplo.model.factoriaAlimento;
+import com.ejemplo.model.factoriaElectronico;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -11,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -72,23 +76,42 @@ public class ProductoViewFX extends Application {
         Label lblPrecio = new Label("Precio:");
         TextField txtPrecio = new TextField(precioInicial > 0 ? String.valueOf(precioInicial) : "");
 
+        Label lblTipo = new Label("Tipo de Producto:");
+        ComboBox<String> cmbTipo = new ComboBox<>();
+        cmbTipo.getItems().addAll("Alimento", "Electrónico");
+        cmbTipo.setValue("Alimento"); // Valor por defecto
+
         Button btnGuardar = new Button("Guardar");
         btnGuardar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10px;");
         btnGuardar.setOnAction(e -> {
             try {
                 String nombre = txtNombre.getText().trim();
                 double precio = Double.parseDouble(txtPrecio.getText().trim());
-                
+                String tipo = cmbTipo.getValue(); // Obtiene el tipo seleccionado
+
                 if (nombre.isEmpty() || precio <= 0) {
                     mostrarMensaje("Datos inválidos. Verifique los campos.");
                     return;
                 }
-                
+                FactoriaProducto factoria;
+
+                // Seleccionar la fábrica correcta según el tipo
+                if (tipo.equals("Alimento")) {
+                    factoria = new factoriaAlimento();
+                } else if (tipo.equals("Electrónico")) {
+                    factoria = new factoriaElectronico();
+                } else {
+                    mostrarMensaje("Tipo de producto no válido.");
+                    return;
+                }
+        
+                // Crear el producto utilizando la fábrica
+                Producto producto = factoria.crearProducto(tipo, (id == null ? 0 : id), nombre, precio);
                 if (id == null) {
-                    productoController.agregarProducto(nombre, precio);
+                    productoController.agregarProducto(tipo, nombre, precio);
                     mostrarMensaje("Producto agregado correctamente");
                 } else {
-                    productoController.actualizarProducto(id, nombre, precio);
+                    productoController.actualizarProducto(tipo, id, nombre, precio);
                     mostrarMensaje("Producto actualizado correctamente");
                 }
                 stage.close();
@@ -102,8 +125,9 @@ public class ProductoViewFX extends Application {
         grid.add(lblPrecio, 0, 1);
         grid.add(txtPrecio, 1, 1);
         grid.add(btnGuardar, 1, 2);
-
-        stage.setScene(new Scene(grid, 350, 200));
+        grid.add(lblTipo, 0, 2); // Agregado
+        grid.add(cmbTipo, 1, 2); 
+        stage.setScene(new Scene(grid, 350, 250)); // Ajustado el tamaño
         stage.show();
     }
 

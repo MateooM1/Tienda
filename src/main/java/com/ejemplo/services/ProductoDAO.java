@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ejemplo.model.FactoriaProducto;
+import com.ejemplo.model.FactoryProvider;
 import com.ejemplo.model.Producto;
 
 public class ProductoDAO implements ProductoService {
@@ -35,7 +37,7 @@ public class ProductoDAO implements ProductoService {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Producto(rs.getInt("id"), rs.getString("nombre"), rs.getDouble("precio"));
+                return new Producto(rs.getString("tipo"),rs.getInt("id"), rs.getString("nombre"), rs.getDouble("precio"));
             } else {
                 throw new Exception("Producto no encontrado con ID: " + id);
             }
@@ -53,7 +55,7 @@ public class ProductoDAO implements ProductoService {
              ResultSet rs = stmt.executeQuery(query)) {
              
             while (rs.next()) {
-                productos.add(new Producto(rs.getInt("id"), rs.getString("nombre"), rs.getDouble("precio")));
+                productos.add(new Producto(rs.getString("tipo"),rs.getInt("id"), rs.getString("nombre"), rs.getDouble("precio")));
             }
         } catch (SQLException e) {
             throw new Exception("Error al obtener la lista de productos: " + e.getMessage(), e);
@@ -107,6 +109,7 @@ public class ProductoDAO implements ProductoService {
 
             while (rs.next()) {
                 productos.add(new Producto(
+                    rs.getString("tipo"),
                     rs.getInt("id"),
                     rs.getString("nombre"),
                     rs.getDouble("precio")
@@ -116,5 +119,10 @@ public class ProductoDAO implements ProductoService {
             throw new Exception("Error al obtener productos por rango de precio: " + e.getMessage(), e);
         }
         return productos;
+    }
+    
+    public Producto crearProducto(String tipo, int id, String nombre, double precio) {
+        FactoriaProducto factory = FactoryProvider.getFactory(tipo);
+        return factory.crearProducto(tipo, id, nombre, precio);
     }
 }

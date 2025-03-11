@@ -3,9 +3,8 @@ package com.ejemplo.controller;
 import java.util.List;
 
 import com.ejemplo.model.FactoriaProducto;
+import com.ejemplo.model.FactoryProvider;
 import com.ejemplo.model.Producto;
-import com.ejemplo.model.factoriaAlimento;
-import com.ejemplo.model.factoriaElectronico;
 import com.ejemplo.services.ProductoDAO;
 import com.ejemplo.view.ErrorHandler;
 
@@ -18,9 +17,9 @@ public class ProductoController {
         this.productoDAO = new ProductoDAO();
     }
 
-    public void agregarProducto(String nombre, double precio) {
+    public void agregarProducto(String tipo , String nombre, double precio) {
         try {
-            Producto producto = new Producto(0, nombre, precio);
+            Producto producto = new Producto(tipo, 0, nombre, precio);
             productoDAO.agregar(producto);
         } catch (Exception e) {
             ErrorHandler.showError(e.getMessage());
@@ -45,9 +44,9 @@ public class ProductoController {
         }
     }
 
-    public void actualizarProducto(int id, String nombre, double precio) {
+    public void actualizarProducto(String tipo, int id, String nombre, double precio) {
         try {
-            Producto producto = new Producto(id, nombre, precio);
+            Producto producto = new Producto(tipo, id, nombre, precio);
             productoDAO.actualizar(producto);
         } catch (Exception e) {
             ErrorHandler.showError(e.getMessage());
@@ -69,11 +68,15 @@ public class ProductoController {
             ErrorHandler.showError(e.getMessage());
             return null;
         }
+
     }
-
-        FactoriaProducto factoriaAlimento = new factoriaAlimento();
-        Producto manzana = factoriaAlimento.crearProducto(1, "Manzana", 1.50, "2025-01-01", "0.3");
-
-        FactoriaProducto factoriaElectronico = new factoriaElectronico();
-        Producto laptop = factoriaElectronico.crearProducto(2, "Laptop Dell", 1200.00, "Dell", "24");
+    public void crearYAgregarProducto(String tipo, int id, String nombre, double precio, String atributo1, String atributo2) {
+        try {
+            FactoriaProducto factoria = FactoryProvider.getFactory(tipo);
+            Producto producto = factoria.crearProducto(tipo, id, nombre, precio);
+            productoDAO.agregar(producto);
+        } catch (Exception e) {
+            ErrorHandler.showError(e.getMessage());
+        }
+    }
     }

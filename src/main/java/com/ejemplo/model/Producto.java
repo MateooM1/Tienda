@@ -2,7 +2,7 @@ package com.ejemplo.model;
 
 import java.util.Random;
 
-public class Producto {
+public class Producto implements Cloneable {
     private int id;
     private String nombre;
     private double precio;
@@ -59,4 +59,12 @@ public class Producto {
     public String toString() {
         return "Producto{tipo='" + tipo + "', id=" + id + ", nombre='" + nombre + "', precio=" + precio + "}";   
      }
+
+     public Producto clone() {
+        try {
+            return (Producto) super.clone(); 
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Error al clonar el producto", e);
+        }
+    }
 }

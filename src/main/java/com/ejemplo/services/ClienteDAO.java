@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.ejemplo.model.Cliente;
 
-public class ClienteDAO {
+public class ClienteDAO implements CRUD<Cliente> {
     public void agregar(Cliente cliente) throws Exception {
         String query = "INSERT INTO clientes (nombre, email) VALUES (?, ?)";
         try (Connection connection = ConnectionDB.getInstancia().getConexion();
